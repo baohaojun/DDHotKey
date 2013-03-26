@@ -10,13 +10,74 @@
 
 #import "DDHotKeyAppDelegate.h"
 #import "DDHotKeyCenter.h"
+#include "Python/Python.h"
+
+DDHotKeyAppDelegate* theAppDelegate;
+
+PyObject* ini_Parse(PyObject* self, PyObject* pArgs)
+{
+	char* key = NULL;
+	char* mod = NULL;
+	char* cmd = NULL;
+	
+	if (!PyArg_ParseTuple(pArgs, "sss", &key, &mod, &cmd)) return NULL;
+
+	[theAppDelegate pythonOutWithKey:[NSString stringWithCString: key]
+			      mod:[NSString stringWithCString: mod]
+			      cmd:[NSString stringWithCString: cmd]];
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyMethodDef iniMethods[] = {
+	{"Parse", ini_Parse, METH_VARARGS, "Logs stdout"},
+	{NULL, NULL, 0, NULL}
+};
+
 
 @implementation DDHotKeyAppDelegate
 
 @synthesize window, output;
 
+- (void)pythonOutWithKey:(NSString *)key mod:(NSString *)mod cmd:(NSString *)cmd  {
+    NSLog(@"%@: %@: %@", key, mod, cmd);
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-	// Insert code here to initialize your application 
+    theAppDelegate = self;
+    Py_SetProgramName("Python Console");
+
+    // Initialize the Python interpreter.
+    Py_Initialize();
+
+    Py_InitModule("ini", iniMethods);
+	
+    PyRun_SimpleString(
+		       /* start code-generator 
+			  expand <<EOF | here-doc-to-cstr
+			  import ini
+			  import os
+			  ini_path = os.path.join(os.path.expanduser("~"), ".mac-hotkey.rc")
+			  ini_file = open(ini_path)
+			  import re
+			  for line in ini_file:
+			      m = re.match(r"(\S+)\s+(\S+)\s+(.*)", line)
+                              ini.Parse(m.group(1), m.group(2), m.group(3))
+EOF
+			  end code-generator */
+		       // start generated code
+		       "import ini\n"
+		       "import os\n"
+		       "ini_path = os.path.join(os.path.expanduser(\"~\"), \".mac-hotkey.rc\")\n"
+		       "ini_file = open(ini_path)\n"
+		       "import re\n"
+		       "for line in ini_file:\n"
+		       "    m = re.match(r\"(\\S+)\\s+(\\S+)\\s+(.*)\", line)\n"
+		       "    ini.Parse(m.group(1), m.group(2), m.group(3))\n"
+
+		       // end generated code
+		       );
 }
 
 - (void) addOutput:(NSString *)newOutput {
