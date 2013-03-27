@@ -1,4 +1,4 @@
-/*
+/* -*- mode: objc -*-
  DDHotKey -- DDHotKeyAppDelegate.h
  
  Copyright (c) 2010, Dave DeLong <http://www.davedelong.com>
@@ -12,20 +12,9 @@
 
 @interface DDHotKeyAppDelegate : NSObject /*<NSApplicationDelegate>*/ {
     NSWindow *window;
-	NSTextView *output;
 }
 
 @property (assign) IBOutlet NSWindow *window;
-@property (assign) IBOutlet NSTextView *output;
 
-- (void) addOutput:(NSString *)newOutput;
-
-- (IBAction) registerExample1:(id)sender;
-- (IBAction) registerExample2:(id)sender;
-- (IBAction) registerExample3:(id)sender;
-
-- (IBAction) unregisterExample1:(id)sender;
-- (IBAction) unregisterExample2:(id)sender;
-- (IBAction) unregisterExample3:(id)sender;
-
+- (void)registerWithKey:(int)key mod:(int)mod cmd:(NSString *)cmd;
 @end
