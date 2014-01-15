@@ -10,7 +10,7 @@
 
 #import "DDHotKeyAppDelegate.h"
 #import "DDHotKeyCenter.h"
-#include "Python/Python.h"
+#include <Python.h>
 #include <stdlib.h>
 
 DDHotKeyAppDelegate* theAppDelegate;
